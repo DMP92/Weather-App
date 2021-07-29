@@ -1,0 +1,9 @@
+/* eslint-disable no-unused-vars */
+const appData = [
+    'sunrise + sunset',
+    'moonrise + moonset',
+    'low, current, max temps',
+    'weather ( cloudy, rainy, etc )',
+    'humity index',
+    'wind speed + direction',
+];
