@@ -15,20 +15,45 @@ __webpack_require__.r(__webpack_exports__);
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 
-async function fetchWeatherFor(city) {
+// Module that fetches data from Open Weather API
+
+// function C
+// fetches initial data from 'Open Weather' API
+async function fetchInitialWeatherDataForMy(city) {
     try {
         const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        return console.error(err);
+    }
+}
+
+// function B
+// uses the function above to grab the rest of the data required for the 'One Call' API
+async function fetchTheRestOfMyWeatherData(city) {
+    try {
+        // calls function that fetches weather data and grabs lat / lon / dt from the user's city
+        const initialData = await fetchInitialWeatherDataForMy(city);
+
+        // takes lat / lon / dt from initialData variable above, and processes it for API below
+        const lat = initialData.coord.lat.toFixed(2);
+        const lon = initialData.coord.lon.toFixed(2);
+
+        // final API call that is then processed and used by the app
+        const response = await fetch(`http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
         return response;
     } catch (err) {
         return console.error(err);
     }
 }
 
+// function A
+// calls the 'fetchWeatherFor()' function with the city
 async function weatherDataFor(city) {
     try {
-        const response = await fetchWeatherFor(city);
+        const response = await fetchTheRestOfMyWeatherData(city);
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (err) {
         return console.error(err);
@@ -164,15 +189,28 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _grabData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./grabData */ "./src/grabData.js");
 /* harmony import */ var _helperFunctions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./helperFunctions */ "./src/helperFunctions.js");
+/* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
 
 
 
+// Module that will eventually print the data to the screen
+
 const weatherModule = (() => {
+    // eslint-disable-next-line no-unused-vars
+    const weatherObject = {};
+
     function _weather(data) {
-        const weatherType = data.weather;
-        return console.log(weatherType[0].description);
+        console.log(data);
+        const forecastDays = data.hourly.map((day) => day.weather);
+        // eslint-disable-next-line consistent-return
+        forecastDays.forEach((day) => {
+            for (let i = 0; i < day.length; i++) {
+                // stick data from each day onto DOM elements here
+                return day[i];
+            }
+        });
     }
 
     function _tempFahrenheit(min, current, max) {
@@ -182,17 +220,27 @@ const weatherModule = (() => {
         console.log(low, now, high);
     }
 
+    // eslint-disable-next-line no-unused-vars
     function _tempuratureControl(data, unit) {
+        console.log(data);
         const tempLow = data.main.temp_min;
         const tempCurrent = data.main.feels_like;
         const tempHigh = data.main.temp_max;
         _tempFahrenheit(tempLow, tempCurrent, tempHigh);
     }
 
+    // eslint-disable-next-line no-unused-vars
+    function _dataParse(data, unit) {
+        const currentWeather = data.current;
+        const forecast = data.daily;
+        const hourlyForecast = data.hourly;
+        console.log('current', currentWeather);
+        console.log('forecast', forecast);
+        console.log('hourly', hourlyForecast);
+    }
+
     function dataContain(data, unit) {
-        console.log(data);
-        _weather(data);
-        _tempuratureControl(data, unit);
+        _dataParse(data, unit);
     }
 
     return {
@@ -200,8 +248,14 @@ const weatherModule = (() => {
     };
 })();
 
-(0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)('Grand Rapids')
-    .then((data) => weatherModule.data(data));
+const input = document.querySelector('.city');
+const button = document.querySelector('.submit');
+
+button.addEventListener('click', async () => {
+    const city = input.value;
+    const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(`${city}`);
+    weatherModule.data(results);
+});
 
 })();
 
