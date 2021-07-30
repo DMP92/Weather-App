@@ -7,3 +7,5 @@ const appData = [
     'humity index',
     'wind speed + direction',
 ];
+
+// create a way for the unit button to reset all temps on the page
