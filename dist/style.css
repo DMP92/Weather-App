@@ -1,9 +1,174 @@
+@media screen and (min-width: 1025px) {
+    :root {
+        --header-height: 80px;
+        --header-grid: 
+                "icon title"
+                "icon input submit unit";
+        --city-col: 3/9;
+        --city-row: 5/9;
+        --submit-col: 7/8;
+        --submit-row: 6/10;
+        --unit-col: 8/9;
+        --unit-row: 6/10;
+        --button-height: 75%;
+        --icon-col: 1/2;
+        --icon-row: 1/10;
+        --icon-justify: center;
+    }
+}
+
+@media screen and (max-width: 1025px) {
+    :root {
+        --header-height: 80px;
+        --header-grid: 
+                "icon title"
+                "icon input submit unit";
+        --city-col: 3/9;
+        --city-row: 5/9;
+        --submit-col: 7/8;
+        --submit-row: 6/10;
+        --unit-col: 8/9;
+        --unit-row: 6/10;
+        --button-height: 75%;
+        --icon-col: 1/3;
+        --icon-row: 1/10;
+        --icon-justify: start;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    :root {
+        --header-height: 80px;
+        --header-grid: 
+                "icon title"
+                "icon input submit unit";
+            --city-col: 4/9;
+            --city-row: 5/9;
+            --submit-col: 5/7;
+            --submit-row: 9/10;
+            --unit-col: 7/9;
+            --unit-row: 9/10;
+            --button-height: 100%;
+            --icon-col: 1/3;
+            --icon-row: 1/10;
+            --icon-justify: start;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    :root {
+        --header-height: 80px;
+        --header-grid: 
+                "icon title"
+                "icon input"
+                "icon submit unit";
+        --city-col: 4/9;
+        --city-row: 5/9;
+        --submit-col: 5/7;
+        --submit-row: 9/10;
+        --unit-col: 7/9;
+        --unit-row: 9/10;
+        --button-height: 100%;
+        --icon-col: 1/3;
+        --icon-row: 1/10;
+        --icon-justify: center;
+    }
+}
+
 body {
-    background-color: grey;
+    display: grid;
+    overflow-x: hidden;
+    padding: 0%;
+    margin: 0%;
+    width: 100vw;
+    height: 100%;
+    min-width: 300px;
+    background-color: white;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(20, 1fr);
+    grid-template-areas: 
+            "header"
+            "input"
+            "current"
+            "hourly"
+            "forecast"
+            "footer";
+    justify-content: center;
+}
+
+.header {
+    display: grid;
+    justify-content: center;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    grid-template-areas: var(--header-grid);
+    grid-area: "header";
+    background-color: rgba(0, 0, 0, 0.822);
+    grid-column: 0/1;
+    grid-row: 0/1;
+    width: 100%;
+    height: var(--header-height);
+}
+
+.appIcon {
+    grid-area: "icon";
+    grid-column: var(--icon-col);
+    grid-row: var(--icon-row);
+    width: 90px;
+    height: 40px;
+    justify-self: var(--icon-justify);
+    align-self: center;
+    margin-left: 15%;
+}
+
+.input {
+    grid-area: "input";
+    background-color: whitesmoke;
+    grid-column: 0/1;
+    grid-row: 2/4;
+    height: 45%;
+    width: 100%;
+    
+}
+
+.city {
+    grid-area: "input";
+    grid-column: var(--city-col);
+    grid-row: var(--city-row);
+    height: 100%;
+    background-color: transparent;
+    border: 1px solid white;
+    border-radius: 3px;
+    text-indent: 5px;
+    color: coral;
+    font-weight: 300;
+    
+}
+
+.submit {
+    display: grid;
+    grid-area: "submit";
+    grid-column: var(--submit-col);
+    grid-row: var(--submit-row);
+    width: 80%;
+    justify-self: center;
+    align-self: center;
+}
+
+.unit {
+    display: grid;
+    grid-area: "unit";
+    grid-column: var(--unit-col);
+    grid-row: var(--unit-row);
+    width: 80%;
+    align-self: center;
+    align-content: center;
 }
 
 button {
-    width: 55px;
-    height: 20px;
+    width: 80px;
+    height: var(--button-height);
+    margin-left: 5px;
+    margin-right: 5px;
     text-align: center;
 }
