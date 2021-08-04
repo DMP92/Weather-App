@@ -2,8 +2,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 import './printToScreen';
+import { toDate, format } from 'date-fns';
+import { utcToZonedTime, getTimezoneOffset } from 'date-fns-tz';
+import fromUnixTime from 'date-fns/fromUnixTime';
 
 const convertUnitTo = (() => {
+    function addStr(str, index, stringToAdd) {
+        return str.substring(0, index) + stringToAdd + str.substring(index, str.length);
+    }
+
     function fahrenheit(data) {
         const kelvinToFahrenheit = (data - 273.15) * (9 / 5) + 32;
         return Math.round(kelvinToFahrenheit);
@@ -16,13 +23,24 @@ const convertUnitTo = (() => {
     // returns converted weekly temps - fahrenheit
     // eslint-disable-next-line consistent-return
 
-    function unixToDateTime(unix) {
-        const unixStamp = unix;
-        const date = new Date(unixStamp * 1000);
-        const hours = date.getHours();
-        const minutes = `0${date.getMinutes()}`;
-        const formattedTime = `${hours}:${minutes.substr(-2)}`;
-        return formattedTime;
+    function formatTime(string) {
+        const time = string.toString();
+        const newTime = time.substr(0, 25);
+        const comma = ', ';
+        const news = addStr(newTime, 10, comma);
+        return news;
+    }
+
+    // converts target city's .dt and timezone into current time
+    function unixToDateTime(unix, tz) {
+        const targetTime = fromUnixTime(unix);
+        const properTime = utcToZonedTime(targetTime, tz);
+        const time = formatTime(properTime);
+        return time;
+    }
+
+    function timeZoneOffset(date) {
+
     }
 
     return {

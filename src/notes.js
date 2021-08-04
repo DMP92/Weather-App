@@ -9,3 +9,8 @@ const appData = [
 ];
 
 // create a way for the unit button to reset all temps on the page
+
+// I need to get google reverse geocoding down for the project to collect
+// state name
+
+// also, I need to find a way to edit the date and time shown

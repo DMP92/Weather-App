@@ -7,11 +7,15 @@ import weatherDataFor from './grabData';
 import convertUnitTo from './helperFunctions';
 import dailyWeatherModule from './forecast';
 import hourly from './hourly';
+import { printModule } from './printWeather';
+import iconHandler from './iconController';
 
 const input = document.querySelector('.city');
 const button = document.querySelector('.submit');
 const unitButton = document.querySelector('.unit');
 
+// fetches data that is then passed into the 'currentWeatherModule' and all
+// other modules
 async function fetchData() {
     const city = input.value;
     const results = await weatherDataFor(`${city}`);
@@ -21,10 +25,12 @@ async function fetchData() {
     hourly.dataObtain(results);
 }
 
+// upon pressing the submit button, or pressing enter the function grabs required data
 button.addEventListener('click', async () => {
     fetchData();
 });
 
+// acts as another search button to refresh contents of DOM according to unit selected
 window.addEventListener('load', () => {
     unitButton.textContent = 'F';
 });
@@ -49,52 +55,60 @@ const currentWeatherModule = (() => {
     // current time and date
     const today = document.querySelector('.today');
 
-    function currentDateTime(data) {
+    const wToday = {};
+
+    function shareToday() {
+        const page = 'current';
+        printModule.print(wToday, page);
+    }
+
+    function currentDateTime(data, tz) {
         const currentTime = data.dt;
-        const convertTime = convertUnitTo.unix(currentTime);
-        console.log('-------CURRENT-------');
-        console.log(`current time: ${convertTime}`);
-        today.textContent = `current time: ${convertTime}`;
+        const convertTime = convertUnitTo.unix(currentTime, tz);
+        wToday.time = `${convertTime}`;
     }
 
     function _breezeType(windSpeed) {
+        let breezeMessage = '';
+
         switch (true) {
         case windSpeed <= 2.5:
-            console.log('Light breeze');
+            breezeMessage = 'Light breeze.';
             break;
         case windSpeed > 2.5 && windSpeed <= 3.5:
-            console.log('Gentle breeze.');
+            breezeMessage = 'Gentle breeze.';
             break;
         case windSpeed > 3.5 && windSpeed <= 5:
-            console.log('Moderate breeze');
+            breezeMessage = 'Moderate breeze.';
             break;
         case windSpeed > 5 && windSpeed <= 6:
-            console.log('Strong breeze');
+            breezeMessage = 'Strong breeze.';
             break;
         case windSpeed > 6 && windSpeed <= 7:
-            console.log('Near gale');
+            breezeMessage = 'Near gale.';
             break;
         case windSpeed > 7 && windSpeed <= 8:
-            console.log('Gale force winds.');
+            breezeMessage = 'Gale force winds.';
             break;
         case windSpeed > 8:
-            console.log('Storm/hurricane force winds.');
+            breezeMessage = 'Storm/hurricane force winds.';
         }
+        wToday.breeze = breezeMessage;
     }
 
     // data about today's expected wind speed an degree
     function _winds(current) {
         const degree = current.wind_deg;
         const speed = current.wind_speed;
-        console.log(`current wind_degree: ${degree}°`);
-        console.log(`current wind_speed: ${speed}`);
         _breezeType(speed);
+        wToday.windDegree = `Wind: ${degree}°`;
+        wToday.windSpeed = `${speed}mph`;
     }
 
     // grabs data about today's projected humidity
     function _fetchHumidity(current) {
-        const humidity = `current humidity: ${current.humidity} %`;
-        console.log(humidity);
+        const humidity = `Humidity: ${current.humidity} %`;
+        wToday.humidity = humidity;
     }
 
     // grabs today's expected weather patterns
@@ -102,8 +116,8 @@ const currentWeatherModule = (() => {
         const weatherTitle = current.weather[0].main;
         const weatherDescription = current.weather[0].description;
 
-        console.log(`current weather: ${weatherTitle}`);
-        console.log(`current weather: ${weatherDescription}`);
+        wToday.weatherTitle = `${weatherTitle}. `;
+        wToday.weatherDesc = `current weather: ${weatherDescription}`;
     }
 
     // gather's and converts today's expected temps in fahrenheit
@@ -112,8 +126,9 @@ const currentWeatherModule = (() => {
         const currentTemp = convertUnitTo.fahrenheit(current.temp);
         const feelsLike = convertUnitTo.fahrenheit(current.feels_like);
         // uses temps
-        console.log(`current temp: ${currentTemp} °F`);
-        console.log(`current feels like: ${feelsLike} °F`);
+
+        wToday.current = `${currentTemp}° F`;
+        wToday.feelsLike = `Feels like ${feelsLike}° F. `;
     }
 
     // gather's and converts today's expected temps in celcius
@@ -122,8 +137,9 @@ const currentWeatherModule = (() => {
         const currentTemp = convertUnitTo.celcius(current.temp);
         const feelsLike = convertUnitTo.celcius(current.feels_like);
         // uses temps
-        console.log(`current temp: ${currentTemp} °C`);
-        console.log(`current feels like: ${feelsLike} °C`);
+
+        wToday.current = `${currentTemp}° C`;
+        wToday.feelsLike = `Feels like ${feelsLike}° C. `;
     }
 
     // converts the temp based on users selection of either fahrenheit or celcius
@@ -141,26 +157,31 @@ const currentWeatherModule = (() => {
         }
     }
 
+    function weatherIcon(data) {
+        const icons = data.weather[0].icon;
+        const type = 'current';
+        wToday.icon = icons;
+    }
     // sends data off to the different functions inside 'current' weather module
-    function _parseData(current) {
-        currentDateTime(current);
+    function _parseData(current, tz) {
+        currentDateTime(current, tz);
+        weatherIcon(current);
         _fetchHumidity(current);
         prepareTempController(current);
         _fetchWeather(current);
         _winds(current);
+        shareToday(wToday);
     }
 
     // grabs and parses data for future use
-    function obtainData(data) {
+    function obtainData(data, timezone) {
         const currentData = data.current;
-        console.log(currentData);
-        _parseData(currentData);
+        const tz = data.timezone;
+        _parseData(currentData, tz);
     }
 
     return {
         data: obtainData,
+        current: shareToday,
     };
 })();
-
-// module that controls the forecasted weather data
-// ************ 8-day Forecast Weather ************

@@ -1,38 +1,40 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
 
 import convertUnitTo from './helperFunctions';
+import { forecastModule } from './printWeather';
 
 const dailyWeatherModule = (() => {
+    const forecastCollection = {};
+    const forecastedTemp = [];
+    const forecastedHumidity = [];
+    const forecastedRain = [];
+    const forecastedWeather = [];
     // eslint-disable-next-line no-unused-vars
-    function _weather(day) {
-        day.forEach((weather) => {
-            console.log('------forecasted weather------');
-            Object.entries(weather).forEach(([key, value]) => {
-                console.log(key, value);
-            });
+    function _weather(day, i) {
+        let j = 0;
+        Object.entries(day).forEach(([key, value]) => {
+            // id main description icon
+            const weatherObject = [];
+            weatherObject[j] = value;
+            forecastedWeather[i] = weatherObject[j];
+            forecastCollection.weather = forecastedWeather;
         });
+        j += 1;
     }
 
     // accesses the conversion interface in 'helperFunctions.js'
     function fetchTempFahrenheit(forecast) {
         let i = 0;
         forecast.forEach((day) => {
-            i++;
-            if (i === 1) {
-                console.log('------ Today ------');
-            } else {
-                console.log(`------Day ${i} ------`);
-            }
             Object.entries(day.temp).forEach(([key, value]) => {
                 const temp = convertUnitTo.fahrenheit(value);
-                console.log(`forecasted day${i}: ${key} ${temp} °F`);
+                forecastedTemp[i] = `${temp}° F`;
+                forecastCollection.temp = forecastedTemp;
             });
-            if (i === 8) {
-                console.log('-------------------');
-                console.log('-------------------');
-            }
+            i++;
         });
     }
 
@@ -40,12 +42,12 @@ const dailyWeatherModule = (() => {
     function fetchTempCelcius(forecast) {
         let i = 0;
         forecast.forEach((day) => {
-            i++;
-            console.log(`------Day ${i} ------`);
             Object.entries(day.temp).forEach(([key, value]) => {
                 const temp = convertUnitTo.celcius(value);
-                console.log(`forecasted day${i}: ${key} ${temp} °C`);
+                forecastedTemp[i] = `${temp}° C`;
+                forecastCollection.temp = forecastedTemp;
             });
+            i++;
         });
     }
 
@@ -64,26 +66,34 @@ const dailyWeatherModule = (() => {
 
     // humidity control
     function displayHumidity(forecast) {
-        console.log('--Forecasted Humidity--');
+        let i = 0;
         forecast.forEach((day) => {
             const humidityLevel = day.humidity;
-            console.log(`forecasted day: ${humidityLevel}`);
+            forecastedHumidity[i] = `humidity: ${humidityLevel}%`;
+            forecastCollection.humidity = forecastedHumidity;
+            i += 1;
         });
     }
 
     // gives the chance and amount of rain
     function _chanceOfRain(forecast) {
+        let i = 0;
         forecast.forEach((day) => {
-            console.log(`Chance of Rain ${day.pop}`);
             if (day.rain !== undefined) {
-                console.log(`${day.rain}mm`);
+                forecastedRain[i] = `Rain: ${day.pop * 100}% - ${day.rain}mm`;
+            } else {
+                forecastedRain[i] = `Rain: ${day.pop * 100}%`;
             }
+            forecastCollection.rain = forecastedRain;
+            i += 1;
         });
     }
     // breaks down forecasted weather and sends data off to their respective functions
     function _forecastParse(forecast) {
+        let i = 0;
         forecast.forEach((day) => {
-            _weather(day.weather);
+            _weather(day.weather, i);
+            i += 1;
         });
     }
 
@@ -91,11 +101,11 @@ const dailyWeatherModule = (() => {
     function _dataParse(data) {
         // 8 day forecasted data
         const forecast = data.daily;
-        console.log(forecast);
         tempController(forecast);
         displayHumidity(forecast);
         _forecastParse(forecast);
         _chanceOfRain(forecast);
+        forecastModule.print(forecastCollection);
     }
 
     function dataContain(data) {
