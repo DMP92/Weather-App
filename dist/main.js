@@ -1267,8 +1267,10 @@ const hourly = (() => {
     const hourTempF = [];
     const hourTempC = [];
     const hourRain = [];
+    const hourDay = [];
     const hourTime = [];
     const hourWeather = [];
+    const hourHumidity = [];
 
     // gather's and converts today's expected temps in fahrenheit
     function prepareTempFahrenheit(hours, i) {
@@ -1281,7 +1283,15 @@ const hourly = (() => {
 
     function timeOfHour(hours, i) {
         const time = _helperFunctions__WEBPACK_IMPORTED_MODULE_0__.default.unix(hours.dt);
-        hourTime[i] = `${time}`;
+        // splits the unix string up into usable chunks for this application
+        const day = time.slice(0, 11);
+        // eslint-disable-next-line no-shadow
+        const timeOfHour = time.slice(18, 23);
+        // uses the manipulated strings
+        hourDay[i] = day;
+        hourTime[i] = timeOfHour;
+        // gives the array to the object to be printed
+        hour.day = hourDay;
         hour.time = hourTime;
     }
 
@@ -1292,6 +1302,11 @@ const hourly = (() => {
         hour.rain = hourRain;
     }
 
+    function hourlyHumidity(hours, i) {
+        const humidityLevel = `${hours.humidity}% Humidity`;
+        hourHumidity[i] = humidityLevel;
+        hour.humidity = hourHumidity;
+    }
     // gather's and converts today's expected temps in celcius
     function prepareTempCelcius(hours, i) {
         // converts temps
@@ -1350,6 +1365,7 @@ const hourly = (() => {
             prepareTempController(hr, i);
             hoursRainChance(hr, i);
             timeOfHour(hr, i);
+            hourlyHumidity(hr, i);
             i += 1;
         });
 
@@ -1359,6 +1375,7 @@ const hourly = (() => {
     // obtains and parses out weather data
     function dataObtain(data) {
         const hours = data.hourly;
+        console.log(hours);
         parseData(hours);
     }
 
@@ -1441,10 +1458,79 @@ __webpack_require__.r(__webpack_exports__);
 const hourlyModule = (() => {
     const hourlyDiv = document.querySelector('.hourly');
 
+    function printPic(object) {
+        const picture = object;
+        const image = document.querySelectorAll('.hourPic');
+        const imageData = Array.from(image);
+        let i = 0;
+        picture.forEach((pic) => {
+            const weatherPic = document.createElement('img');
+            weatherPic.src = `/src/Images/${pic.icon}@2x.png`;
+            weatherPic.style.cssText = 'width: 50px; height: 50px';
+            imageData[i].appendChild(weatherPic);
+            i += 1;
+        });
+    }
+
     function printTemps(object) {
         const temps = object;
+        const tempContainer = document.querySelectorAll('.hourTemp');
+        const tempData = Array.from(tempContainer);
+        let i = 0;
         temps.forEach((temp) => {
-            const tempContain = document.createElement('div');
+            tempData[i].textContent = temp;
+            i += 1;
+        });
+    }
+
+    function printRain(object) {
+        const rainContainers = document.querySelectorAll('.hourRain');
+        const rainPic = document.querySelectorAll('.rainPic');
+
+        const rainPics = Array.from(rainPic);
+        const rain = Array.from(rainContainers);
+        let i = 0;
+        rain.forEach((hour) => {
+            if (object[i] !== '0%') {
+                const rainImg = document.createElement('img');
+                rainImg.src = '/src/Images/09d@2x.png';
+                rainImg.style.cssText = 'width: 50px; height: 50px';
+                rainPics[i].appendChild(rainImg);
+                rain[i].textContent = object[i];
+            }
+            i += 1;
+        });
+    }
+
+    function printHumidity(object) {
+        const humidityContainer = document.querySelectorAll('.hourHumidity');
+        const humidityLevels = Array.from(humidityContainer);
+        let i = 0;
+        humidityLevels.forEach((hour) => {
+            humidityLevels[i].textContent = object[i];
+            i += 1;
+        });
+    }
+
+    function printDay(object) {
+        const days = document.querySelectorAll('.hourDay');
+        const dayArray = Array.from(days);
+
+        let i = 0;
+
+        dayArray.forEach((day) => {
+            dayArray[i].textContent = object[i];
+            i += 1;
+        });
+    }
+    function printTime(object) {
+        const hourContainer = document.querySelectorAll('.hourTime');
+        const hourArray = Array.from(hourContainer);
+        let i = 0;
+        hourArray.forEach((leHour) => {
+            // eslint-disable-next-line no-param-reassign
+            leHour.textContent = object[i];
+            i += 1;
         });
     }
 
@@ -1456,30 +1542,48 @@ const hourlyModule = (() => {
             hourlyDiv.appendChild(hourDiv);
 
             const hourTemp = document.createElement('div');
-            hourTemp.classList.add('.hourTemp');
+            hourTemp.classList.add('hourTemp');
 
             const hourPic = document.createElement('div');
-            hourPic.classList.add('.hourPic');
+            hourPic.classList.add('hourPic');
+
+            const rainPic = document.createElement('div');
+            rainPic.classList.add('rainPic');
 
             const hoursRain = document.createElement('div');
-            hoursRain.classList.add('.hourRain');
+            hoursRain.classList.add('hourRain');
 
             const hourHumidity = document.createElement('div');
             hourHumidity.classList.add('hourHumidity');
 
+            const hourDay = document.createElement('div');
+            hourDay.classList.add('hourDay');
+
+            const hourTime = document.createElement('div');
+            hourTime.classList.add('hourTime');
+
             hourDiv.appendChild(hourPic);
             hourDiv.appendChild(hourTemp);
+            hourDiv.appendChild(rainPic);
             hourDiv.appendChild(hoursRain);
             hourDiv.appendChild(hourHumidity);
+            hourDiv.appendChild(hourDay);
+            hourDiv.appendChild(hourTime);
+            const divArray = [hourTemp, hourPic, hoursRain, hourHumidity];
+            return divArray;
         });
-        console.log(hourlyDiv.childNodes);
     }
 
     // receives the hourly object from hourly.js
     function printHours(object) {
         console.log(object);
         hourCreate(object.temp);
+        printPic(object.weather);
         printTemps(object.temp);
+        printRain(object.rain);
+        printHumidity(object.humidity);
+        printTime(object.time);
+        printDay(object.day);
     }
 
     return {

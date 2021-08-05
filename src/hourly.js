@@ -10,8 +10,10 @@ const hourly = (() => {
     const hourTempF = [];
     const hourTempC = [];
     const hourRain = [];
+    const hourDay = [];
     const hourTime = [];
     const hourWeather = [];
+    const hourHumidity = [];
 
     // gather's and converts today's expected temps in fahrenheit
     function prepareTempFahrenheit(hours, i) {
@@ -24,7 +26,15 @@ const hourly = (() => {
 
     function timeOfHour(hours, i) {
         const time = convertUnitTo.unix(hours.dt);
-        hourTime[i] = `${time}`;
+        // splits the unix string up into usable chunks for this application
+        const day = time.slice(0, 11);
+        // eslint-disable-next-line no-shadow
+        const timeOfHour = time.slice(18, 23);
+        // uses the manipulated strings
+        hourDay[i] = day;
+        hourTime[i] = timeOfHour;
+        // gives the array to the object to be printed
+        hour.day = hourDay;
         hour.time = hourTime;
     }
 
@@ -35,6 +45,11 @@ const hourly = (() => {
         hour.rain = hourRain;
     }
 
+    function hourlyHumidity(hours, i) {
+        const humidityLevel = `${hours.humidity}% Humidity`;
+        hourHumidity[i] = humidityLevel;
+        hour.humidity = hourHumidity;
+    }
     // gather's and converts today's expected temps in celcius
     function prepareTempCelcius(hours, i) {
         // converts temps
@@ -93,6 +108,7 @@ const hourly = (() => {
             prepareTempController(hr, i);
             hoursRainChance(hr, i);
             timeOfHour(hr, i);
+            hourlyHumidity(hr, i);
             i += 1;
         });
 
@@ -102,6 +118,7 @@ const hourly = (() => {
     // obtains and parses out weather data
     function dataObtain(data) {
         const hours = data.hourly;
+        console.log(hours);
         parseData(hours);
     }
 
