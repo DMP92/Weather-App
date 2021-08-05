@@ -7,36 +7,70 @@ import weatherDataFor from './grabData';
 import convertUnitTo from './helperFunctions';
 import dailyWeatherModule from './forecast';
 import hourly from './hourly';
-import { printModule } from './printWeather';
+import { printModule, clearDOM } from './printWeather';
 import iconHandler from './iconController';
 
-const input = document.querySelector('.city');
+const higherInput = document.querySelector('.city');
+const lowerInput = document.querySelector('.lowerCity');
 const button = document.querySelector('.submit');
 const unitButton = document.querySelector('.unit');
+const inputArray = [];
 
+function inputLimiter(state) {
+    inputArray.pop();
+    inputArray.push(state);
+}
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData() {
-    const city = input.value;
-    const results = await weatherDataFor(`${city}`);
-    dailyWeatherModule.data(results);
-    // eslint-disable-next-line no-use-before-define
-    currentWeatherModule.data(results);
-    hourly.dataObtain(results);
+async function fetchData(input) {
+    const city = inputArray[0];
+
+    if (city === true) {
+        const results = await weatherDataFor(higherInput.value);
+        dailyWeatherModule.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        hourly.dataObtain(results);
+    } else if (city === false) {
+        const results = await weatherDataFor(lowerInput.value);
+        dailyWeatherModule.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        hourly.dataObtain(results);
+    }
 }
 
 // upon pressing the submit button, or pressing enter the function grabs required data
 button.addEventListener('click', async () => {
+    const city = lowerInput.value;
+    clearDOM();
     fetchData();
+});
+
+higherInput.addEventListener('input', () => {
+    inputLimiter(true);
+});
+
+lowerInput.addEventListener('input', () => {
+    inputLimiter(false);
 });
 
 // acts as another search button to refresh contents of DOM according to unit selected
 window.addEventListener('load', () => {
     unitButton.textContent = 'F';
+    lowerInput.value = '';
+    higherInput.value = '';
 });
 
+window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+        clearDOM();
+        fetchData();
+    }
+});
 // gathers temp unit
 unitButton.addEventListener('click', async (e) => {
+    clearDOM();
     fetchData();
 
     switch (true) {
@@ -175,6 +209,7 @@ const currentWeatherModule = (() => {
 
     // grabs and parses data for future use
     function obtainData(data, timezone) {
+        console.log(data);
         const currentData = data.current;
         const tz = data.timezone;
         _parseData(currentData, tz);

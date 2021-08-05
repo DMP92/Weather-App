@@ -118,7 +118,6 @@ const hourly = (() => {
     // obtains and parses out weather data
     function dataObtain(data) {
         const hours = data.hourly;
-        console.log(hours);
         parseData(hours);
     }
 

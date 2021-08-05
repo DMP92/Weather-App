@@ -12,6 +12,7 @@ const dailyWeatherModule = (() => {
     const forecastedHumidity = [];
     const forecastedRain = [];
     const forecastedWeather = [];
+    const forecastedDay = [];
     // eslint-disable-next-line no-unused-vars
     function _weather(day, i) {
         let j = 0;
@@ -23,6 +24,17 @@ const dailyWeatherModule = (() => {
             forecastCollection.weather = forecastedWeather;
         });
         j += 1;
+    }
+
+    function displayDate(date) {
+        let i = 0;
+        date.forEach((day) => {
+            const forecastDate = convertUnitTo.unix(day.dt);
+            const recordedDate = forecastDate.slice(0, 10);
+            forecastedDay[i] = recordedDate;
+            forecastCollection.date = forecastedDay;
+            i += 1;
+        });
     }
 
     // accesses the conversion interface in 'helperFunctions.js'
@@ -80,9 +92,9 @@ const dailyWeatherModule = (() => {
         let i = 0;
         forecast.forEach((day) => {
             if (day.rain !== undefined) {
-                forecastedRain[i] = `Rain: ${day.pop * 100}% - ${day.rain}mm`;
+                forecastedRain[i] = `${Math.round(day.pop * 100)}%`;
             } else {
-                forecastedRain[i] = `Rain: ${day.pop * 100}%`;
+                forecastedRain[i] = `${Math.round(day.pop * 100)}%`;
             }
             forecastCollection.rain = forecastedRain;
             i += 1;
@@ -101,6 +113,7 @@ const dailyWeatherModule = (() => {
     function _dataParse(data) {
         // 8 day forecasted data
         const forecast = data.daily;
+        displayDate(forecast);
         tempController(forecast);
         displayHumidity(forecast);
         _forecastParse(forecast);

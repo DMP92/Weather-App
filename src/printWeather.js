@@ -48,16 +48,6 @@ const hourlyModule = (() => {
         });
     }
 
-    function printHumidity(object) {
-        const humidityContainer = document.querySelectorAll('.hourHumidity');
-        const humidityLevels = Array.from(humidityContainer);
-        let i = 0;
-        humidityLevels.forEach((hour) => {
-            humidityLevels[i].textContent = object[i];
-            i += 1;
-        });
-    }
-
     function printDay(object) {
         const days = document.querySelectorAll('.hourDay');
         const dayArray = Array.from(days);
@@ -99,9 +89,6 @@ const hourlyModule = (() => {
             const hoursRain = document.createElement('div');
             hoursRain.classList.add('hourRain');
 
-            const hourHumidity = document.createElement('div');
-            hourHumidity.classList.add('hourHumidity');
-
             const hourDay = document.createElement('div');
             hourDay.classList.add('hourDay');
 
@@ -112,41 +99,157 @@ const hourlyModule = (() => {
             hourDiv.appendChild(hourTemp);
             hourDiv.appendChild(rainPic);
             hourDiv.appendChild(hoursRain);
-            hourDiv.appendChild(hourHumidity);
             hourDiv.appendChild(hourDay);
             hourDiv.appendChild(hourTime);
-            const divArray = [hourTemp, hourPic, hoursRain, hourHumidity];
+            const divArray = [hourTemp, hourPic, hoursRain];
             return divArray;
         });
     }
 
     // receives the hourly object from hourly.js
     function printHours(object) {
-        console.log(object);
         hourCreate(object.temp);
         printPic(object.weather);
         printTemps(object.temp);
         printRain(object.rain);
-        printHumidity(object.humidity);
         printTime(object.time);
         printDay(object.day);
     }
 
+    function deleteHours() {
+        const hourDiv = document.querySelector('.hourly');
+
+        while (hourDiv.firstChild) {
+            hourDiv.removeChild(hourDiv.firstChild);
+        }
+    }
     return {
         print: printHours,
+        delete: deleteHours,
     };
 })();
 
 const forecastModule = (() => {
+    function dayDates(object) {
+        const dateContainer = document.querySelectorAll('.dayDate');
+        const days = Array.from(dateContainer);
+        let i = 0;
+        days.forEach(() => {
+            days[i].textContent = object.date[i];
+            i += 1;
+        });
+    }
+
+    function dayTemps(object) {
+        const tempContainers = document.querySelectorAll('.dayTemp');
+        const temps = Array.from(tempContainers);
+        let i = 0;
+
+        temps.forEach(() => {
+            temps[i].textContent = object[i];
+            i += 1;
+        });
+    }
+
+    function dayWeathers(object) {
+        const weatherContainer = document.querySelectorAll('.dayWeather');
+        const daysWeather = Array.from(weatherContainer);
+        let i = 0;
+
+        daysWeather.forEach(() => {
+            const img = document.createElement('img');
+            img.src = `/src/Images/${object[i].icon}@2x.png`;
+            img.style.cssText = 'width: 50px; height: 50px';
+            daysWeather[i].appendChild(img);
+            i += 1;
+        });
+    }
+
+    function dayRainIcons(object) {
+        const rainContainer = document.querySelectorAll('.dayRain');
+        const dayRainImgContainers = document.querySelectorAll('.dayRainIcon');
+        const rainData = Array.from(rainContainer);
+        const dayRainImgs = Array.from(dayRainImgContainers);
+        let i = 0;
+        rainData.forEach(() => {
+            const img = document.createElement('img');
+            img.src = '/src/Images/09d@2x.png';
+            img.style.cssText = 'width: 50px; height: 50px;';
+            dayRainImgs[i].appendChild(img);
+            rainData[i].textContent = object[i];
+            i += 1;
+        });
+    }
+
+    function dayGridCreate() {
+        const dayContainers = document.querySelectorAll('.day');
+        const days = Array.from(dayContainers);
+        let i = 0;
+
+        days.forEach((day) => {
+            const dayDate = document.createElement('div');
+            dayDate.classList.add('dayDate');
+
+            const dayTemp = document.createElement('div');
+            dayTemp.classList.add('dayTemp');
+
+            const dayWeather = document.createElement('div');
+            dayWeather.classList.add('dayWeather');
+
+            const dayRainIcon = document.createElement('div');
+            dayRainIcon.classList.add('dayRainIcon');
+
+            const dayRain = document.createElement('div');
+            dayRain.classList.add('dayRain');
+
+            days[i].appendChild(dayDate);
+            days[i].appendChild(dayWeather);
+            days[i].appendChild(dayTemp);
+            days[i].appendChild(dayRainIcon);
+            days[i].appendChild(dayRain);
+
+            i += 1;
+        });
+    }
+
+    function dayCreate(object) {
+        object.forEach(() => {
+            const dayContainer = document.querySelector('.forecast');
+            const day = document.createElement('div');
+            day.classList.add('day');
+            dayContainer.appendChild(day);
+        });
+    }
+
     function printForecast(object) {
-        console.log(object);
+        dayCreate(object.humidity);
+        dayGridCreate();
+        dayDates(object);
+        dayWeathers(object.weather);
+        dayRainIcons(object.rain);
+        let i = 0;
+
+        object.temp.forEach((obj) => {
+            dayTemps(object.temp);
+            i += 1;
+        });
+    }
+
+    function deleteForecast() {
+        const forecastDiv = document.querySelector('.forecast');
+
+        while (forecastDiv.firstChild) {
+            forecastDiv.removeChild(forecastDiv.firstChild);
+        }
     }
 
     return {
         print: printForecast,
+        delete: deleteForecast,
     };
 })();
-// Module that gathers each object to be printed to the DOM
+
+// Module that gathers all data for the day's weather and prints it to the DOM
 const printModule = (() => {
     const weatherPic = document.querySelector('.weatherPic');
     const today = document.querySelector('.today').children;
@@ -223,10 +326,30 @@ const printModule = (() => {
         }
     }
 
+    function deleteData() {
+        const todayDiv = document.querySelector('.today');
+        switch (true) {
+        case todayDiv.firstChild:
+            while (todayDiv.firstChild) {
+                todayDiv.removeChild(todayDiv.firstChild);
+            }
+            break;
+        }
+    }
+
     return {
         print: printObjects,
         check: checkForImage,
+        delete: deleteData,
     };
 })();
 
-export { printModule, forecastModule, hourlyModule };
+function clearDOM() {
+    printModule.delete();
+    hourlyModule.delete();
+    forecastModule.delete();
+}
+
+export {
+    printModule, forecastModule, hourlyModule, clearDOM,
+};
