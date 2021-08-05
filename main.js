@@ -999,6 +999,7 @@ const dailyWeatherModule = (() => {
     const forecastedHumidity = [];
     const forecastedRain = [];
     const forecastedWeather = [];
+    const forecastedDay = [];
     // eslint-disable-next-line no-unused-vars
     function _weather(day, i) {
         let j = 0;
@@ -1010,6 +1011,17 @@ const dailyWeatherModule = (() => {
             forecastCollection.weather = forecastedWeather;
         });
         j += 1;
+    }
+
+    function displayDate(date) {
+        let i = 0;
+        date.forEach((day) => {
+            const forecastDate = _helperFunctions__WEBPACK_IMPORTED_MODULE_0__.default.unix(day.dt);
+            const recordedDate = forecastDate.slice(0, 10);
+            forecastedDay[i] = recordedDate;
+            forecastCollection.date = forecastedDay;
+            i += 1;
+        });
     }
 
     // accesses the conversion interface in 'helperFunctions.js'
@@ -1067,9 +1079,9 @@ const dailyWeatherModule = (() => {
         let i = 0;
         forecast.forEach((day) => {
             if (day.rain !== undefined) {
-                forecastedRain[i] = `Rain: ${day.pop * 100}% - ${day.rain}mm`;
+                forecastedRain[i] = `${Math.round(day.pop * 100)}%`;
             } else {
-                forecastedRain[i] = `Rain: ${day.pop * 100}%`;
+                forecastedRain[i] = `${Math.round(day.pop * 100)}%`;
             }
             forecastCollection.rain = forecastedRain;
             i += 1;
@@ -1088,6 +1100,7 @@ const dailyWeatherModule = (() => {
     function _dataParse(data) {
         // 8 day forecasted data
         const forecast = data.daily;
+        displayDate(forecast);
         tempController(forecast);
         displayHumidity(forecast);
         _forecastParse(forecast);
@@ -1375,7 +1388,6 @@ const hourly = (() => {
     // obtains and parses out weather data
     function dataObtain(data) {
         const hours = data.hourly;
-        console.log(hours);
         parseData(hours);
     }
 
@@ -1450,7 +1462,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "printModule": () => (/* binding */ printModule),
 /* harmony export */   "forecastModule": () => (/* binding */ forecastModule),
-/* harmony export */   "hourlyModule": () => (/* binding */ hourlyModule)
+/* harmony export */   "hourlyModule": () => (/* binding */ hourlyModule),
+/* harmony export */   "clearDOM": () => (/* binding */ clearDOM)
 /* harmony export */ });
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
@@ -1502,16 +1515,6 @@ const hourlyModule = (() => {
         });
     }
 
-    function printHumidity(object) {
-        const humidityContainer = document.querySelectorAll('.hourHumidity');
-        const humidityLevels = Array.from(humidityContainer);
-        let i = 0;
-        humidityLevels.forEach((hour) => {
-            humidityLevels[i].textContent = object[i];
-            i += 1;
-        });
-    }
-
     function printDay(object) {
         const days = document.querySelectorAll('.hourDay');
         const dayArray = Array.from(days);
@@ -1553,9 +1556,6 @@ const hourlyModule = (() => {
             const hoursRain = document.createElement('div');
             hoursRain.classList.add('hourRain');
 
-            const hourHumidity = document.createElement('div');
-            hourHumidity.classList.add('hourHumidity');
-
             const hourDay = document.createElement('div');
             hourDay.classList.add('hourDay');
 
@@ -1566,41 +1566,157 @@ const hourlyModule = (() => {
             hourDiv.appendChild(hourTemp);
             hourDiv.appendChild(rainPic);
             hourDiv.appendChild(hoursRain);
-            hourDiv.appendChild(hourHumidity);
             hourDiv.appendChild(hourDay);
             hourDiv.appendChild(hourTime);
-            const divArray = [hourTemp, hourPic, hoursRain, hourHumidity];
+            const divArray = [hourTemp, hourPic, hoursRain];
             return divArray;
         });
     }
 
     // receives the hourly object from hourly.js
     function printHours(object) {
-        console.log(object);
         hourCreate(object.temp);
         printPic(object.weather);
         printTemps(object.temp);
         printRain(object.rain);
-        printHumidity(object.humidity);
         printTime(object.time);
         printDay(object.day);
     }
 
+    function deleteHours() {
+        const hourDiv = document.querySelector('.hourly');
+
+        while (hourDiv.firstChild) {
+            hourDiv.removeChild(hourDiv.firstChild);
+        }
+    }
     return {
         print: printHours,
+        delete: deleteHours,
     };
 })();
 
 const forecastModule = (() => {
+    function dayDates(object) {
+        const dateContainer = document.querySelectorAll('.dayDate');
+        const days = Array.from(dateContainer);
+        let i = 0;
+        days.forEach(() => {
+            days[i].textContent = object.date[i];
+            i += 1;
+        });
+    }
+
+    function dayTemps(object) {
+        const tempContainers = document.querySelectorAll('.dayTemp');
+        const temps = Array.from(tempContainers);
+        let i = 0;
+
+        temps.forEach(() => {
+            temps[i].textContent = object[i];
+            i += 1;
+        });
+    }
+
+    function dayWeathers(object) {
+        const weatherContainer = document.querySelectorAll('.dayWeather');
+        const daysWeather = Array.from(weatherContainer);
+        let i = 0;
+
+        daysWeather.forEach(() => {
+            const img = document.createElement('img');
+            img.src = `/src/Images/${object[i].icon}@2x.png`;
+            img.style.cssText = 'width: 50px; height: 50px';
+            daysWeather[i].appendChild(img);
+            i += 1;
+        });
+    }
+
+    function dayRainIcons(object) {
+        const rainContainer = document.querySelectorAll('.dayRain');
+        const dayRainImgContainers = document.querySelectorAll('.dayRainIcon');
+        const rainData = Array.from(rainContainer);
+        const dayRainImgs = Array.from(dayRainImgContainers);
+        let i = 0;
+        rainData.forEach(() => {
+            const img = document.createElement('img');
+            img.src = '/src/Images/09d@2x.png';
+            img.style.cssText = 'width: 50px; height: 50px;';
+            dayRainImgs[i].appendChild(img);
+            rainData[i].textContent = object[i];
+            i += 1;
+        });
+    }
+
+    function dayGridCreate() {
+        const dayContainers = document.querySelectorAll('.day');
+        const days = Array.from(dayContainers);
+        let i = 0;
+
+        days.forEach((day) => {
+            const dayDate = document.createElement('div');
+            dayDate.classList.add('dayDate');
+
+            const dayTemp = document.createElement('div');
+            dayTemp.classList.add('dayTemp');
+
+            const dayWeather = document.createElement('div');
+            dayWeather.classList.add('dayWeather');
+
+            const dayRainIcon = document.createElement('div');
+            dayRainIcon.classList.add('dayRainIcon');
+
+            const dayRain = document.createElement('div');
+            dayRain.classList.add('dayRain');
+
+            days[i].appendChild(dayDate);
+            days[i].appendChild(dayWeather);
+            days[i].appendChild(dayTemp);
+            days[i].appendChild(dayRainIcon);
+            days[i].appendChild(dayRain);
+
+            i += 1;
+        });
+    }
+
+    function dayCreate(object) {
+        object.forEach(() => {
+            const dayContainer = document.querySelector('.forecast');
+            const day = document.createElement('div');
+            day.classList.add('day');
+            dayContainer.appendChild(day);
+        });
+    }
+
     function printForecast(object) {
-        console.log(object);
+        dayCreate(object.humidity);
+        dayGridCreate();
+        dayDates(object);
+        dayWeathers(object.weather);
+        dayRainIcons(object.rain);
+        let i = 0;
+
+        object.temp.forEach((obj) => {
+            dayTemps(object.temp);
+            i += 1;
+        });
+    }
+
+    function deleteForecast() {
+        const forecastDiv = document.querySelector('.forecast');
+
+        while (forecastDiv.firstChild) {
+            forecastDiv.removeChild(forecastDiv.firstChild);
+        }
     }
 
     return {
         print: printForecast,
+        delete: deleteForecast,
     };
 })();
-// Module that gathers each object to be printed to the DOM
+
+// Module that gathers all data for the day's weather and prints it to the DOM
 const printModule = (() => {
     const weatherPic = document.querySelector('.weatherPic');
     const today = document.querySelector('.today').children;
@@ -1677,11 +1793,29 @@ const printModule = (() => {
         }
     }
 
+    function deleteData() {
+        const todayDiv = document.querySelector('.today');
+        switch (true) {
+        case todayDiv.firstChild:
+            while (todayDiv.firstChild) {
+                todayDiv.removeChild(todayDiv.firstChild);
+            }
+            break;
+        }
+    }
+
     return {
         print: printObjects,
         check: checkForImage,
+        delete: deleteData,
     };
 })();
+
+function clearDOM() {
+    printModule.delete();
+    hourlyModule.delete();
+    forecastModule.delete();
+}
 
 
 
@@ -1782,33 +1916,67 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const input = document.querySelector('.city');
+const higherInput = document.querySelector('.city');
+const lowerInput = document.querySelector('.lowerCity');
 const button = document.querySelector('.submit');
 const unitButton = document.querySelector('.unit');
+const inputArray = [];
 
+function inputLimiter(state) {
+    inputArray.pop();
+    inputArray.push(state);
+}
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData() {
-    const city = input.value;
-    const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(`${city}`);
-    _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
-    // eslint-disable-next-line no-use-before-define
-    currentWeatherModule.data(results);
-    _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+async function fetchData(input) {
+    const city = inputArray[0];
+
+    if (city === true) {
+        const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(higherInput.value);
+        _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+    } else if (city === false) {
+        const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(lowerInput.value);
+        _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+    }
 }
 
 // upon pressing the submit button, or pressing enter the function grabs required data
 button.addEventListener('click', async () => {
+    const city = lowerInput.value;
+    (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
     fetchData();
+});
+
+higherInput.addEventListener('input', () => {
+    inputLimiter(true);
+});
+
+lowerInput.addEventListener('input', () => {
+    inputLimiter(false);
 });
 
 // acts as another search button to refresh contents of DOM according to unit selected
 window.addEventListener('load', () => {
     unitButton.textContent = 'F';
+    lowerInput.value = '';
+    higherInput.value = '';
 });
 
+window.addEventListener('keydown', (e) => {
+    if (e.keyCode === 13) {
+        (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
+        fetchData();
+    }
+});
 // gathers temp unit
 unitButton.addEventListener('click', async (e) => {
+    (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
     fetchData();
 
     switch (true) {
@@ -1947,6 +2115,7 @@ const currentWeatherModule = (() => {
 
     // grabs and parses data for future use
     function obtainData(data, timezone) {
+        console.log(data);
         const currentData = data.current;
         const tz = data.timezone;
         _parseData(currentData, tz);
