@@ -1162,7 +1162,7 @@ async function fetchTheRestOfMyWeatherData(city) {
         const lat = initialData.coord.lat.toFixed(2);
         const lon = initialData.coord.lon.toFixed(2);
         // final API call that is then processed and used by the app
-        const response = await fetch(`api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
+        const response = await fetch(`//api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
         return response;
     } catch (err) {
         return console.error(err);
