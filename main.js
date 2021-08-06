@@ -1495,7 +1495,7 @@ const hourlyModule = (() => {
         let i = 0;
         picture.forEach((pic) => {
             const weatherPic = document.createElement('img');
-            weatherPic.src = `/src/Images/${pic.icon}@2x.png`;
+            weatherPic.src = `Images/${pic.icon}@2x.png`;
             weatherPic.style.cssText = 'width: 50px; height: 50px';
             imageData[i].appendChild(weatherPic);
             i += 1;
@@ -1523,7 +1523,7 @@ const hourlyModule = (() => {
         rain.forEach((hour) => {
             if (object[i] !== '0%') {
                 const rainImg = document.createElement('img');
-                rainImg.src = '/src/Images/09d@2x.png';
+                rainImg.src = 'Images/09d@2x.png';
                 rainImg.style.cssText = 'width: 50px; height: 50px';
                 rainPics[i].appendChild(rainImg);
                 rain[i].textContent = object[i];
@@ -1642,7 +1642,7 @@ const forecastModule = (() => {
 
         daysWeather.forEach(() => {
             const img = document.createElement('img');
-            img.src = `/src/Images/${object[i].icon}@2x.png`;
+            img.src = `Images/${object[i].icon}@2x.png`;
             img.style.cssText = 'width: 50px; height: 50px';
             daysWeather[i].appendChild(img);
             i += 1;
@@ -1657,7 +1657,7 @@ const forecastModule = (() => {
         let i = 0;
         rainData.forEach(() => {
             const img = document.createElement('img');
-            img.src = '/src/Images/09d@2x.png';
+            img.src = 'Images/09d@2x.png';
             img.style.cssText = 'width: 50px; height: 50px;';
             dayRainImgs[i].appendChild(img);
             rainData[i].textContent = object[i];
@@ -1761,7 +1761,7 @@ const printModule = (() => {
         }
         const image = document.createElement('img');
         image.classList.add('image');
-        image.src = `/src/Images/${images.icon}@2x.png`;
+        image.src = `Images/${images.icon}@2x.png`;
         weatherPic.appendChild(image);
         // image.src = ;
         // image.style.cssText = 'width: 80px; height: 80px';
