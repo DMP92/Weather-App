@@ -548,6 +548,7 @@ button {
     }
 
     .cityState {
+        margin-top: 5px;
         grid-area: "cityState";
         display: grid;
         justify-content: center;

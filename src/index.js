@@ -34,7 +34,8 @@ function inputLimiter(state) {
 }
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData() {
+async function fetchData(defaultCity) {
+    clearDOM();
     const city = inputArray[0];
     let results = '';
     let stateName = '';
@@ -72,6 +73,16 @@ async function fetchData() {
         break;
     case city === true && higherInput.value === '':
         stateName = await cityOrCountryName(lowerInput.value);
+        results = await weatherDataFor(stateName.location.name);
+        dailyWeatherModule.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        hourly.dataObtain(results);
+        break;
+    case higherInput.value === '' && lowerInput.value === '':
+        stateName = await cityOrCountryName(defaultCity);
         results = await weatherDataFor(stateName.location.name);
         dailyWeatherModule.data(results);
         // eslint-disable-next-line no-use-before-define
@@ -120,11 +131,12 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
+
 // gathers temp unit
 unitButton.addEventListener('click', async (e) => {
+    const cityState = document.querySelector('.cityState');
+    fetchData(cityState.textContent);
     clearDOM();
-    fetchData();
-
     switch (true) {
     case unitButton.textContent === 'C':
         e.target.textContent = 'F';
@@ -235,7 +247,7 @@ const currentWeatherModule = (() => {
         // uses temps
 
         wToday.current = `${currentTemp}° F`;
-        wToday.feelsLike = `Feels like ${feelsLike}° F. `;
+        wToday.feelsLike = `Feels like ${feelsLike}° F, `;
     }
 
     // gather's and converts today's expected temps in celcius
@@ -246,7 +258,7 @@ const currentWeatherModule = (() => {
         // uses temps
 
         wToday.current = `${currentTemp}° C`;
-        wToday.feelsLike = `Feels like ${feelsLike}° C. `;
+        wToday.feelsLike = `Feels like ${feelsLike}° C, `;
     }
 
     // converts the temp based on users selection of either fahrenheit or celcius

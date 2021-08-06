@@ -1969,7 +1969,8 @@ function inputLimiter(state) {
 }
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData() {
+async function fetchData(defaultCity) {
+    (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
     const city = inputArray[0];
     let results = '';
     let stateName = '';
@@ -2007,6 +2008,16 @@ async function fetchData() {
         break;
     case city === true && higherInput.value === '':
         stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(lowerInput.value);
+        results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
+        _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+        break;
+    case higherInput.value === '' && lowerInput.value === '':
+        stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(defaultCity);
         results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
         _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
         // eslint-disable-next-line no-use-before-define
@@ -2055,11 +2066,12 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
+
 // gathers temp unit
 unitButton.addEventListener('click', async (e) => {
+    const cityState = document.querySelector('.cityState');
+    fetchData(cityState.textContent);
     (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
-    fetchData();
-
     switch (true) {
     case unitButton.textContent === 'C':
         e.target.textContent = 'F';
@@ -2170,7 +2182,7 @@ const currentWeatherModule = (() => {
         // uses temps
 
         wToday.current = `${currentTemp}° F`;
-        wToday.feelsLike = `Feels like ${feelsLike}° F. `;
+        wToday.feelsLike = `Feels like ${feelsLike}° F, `;
     }
 
     // gather's and converts today's expected temps in celcius
@@ -2181,7 +2193,7 @@ const currentWeatherModule = (() => {
         // uses temps
 
         wToday.current = `${currentTemp}° C`;
-        wToday.feelsLike = `Feels like ${feelsLike}° C. `;
+        wToday.feelsLike = `Feels like ${feelsLike}° C, `;
     }
 
     // converts the temp based on users selection of either fahrenheit or celcius
