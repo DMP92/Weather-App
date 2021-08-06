@@ -1143,7 +1143,7 @@ __webpack_require__.r(__webpack_exports__);
 // fetches initial data from 'Open Weather' API
 async function fetchInitialWeatherDataForMy(city) {
     try {
-        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
+        const response = await fetch(`//api.openweathermap.org/data/2.5/weather?q=${city}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
         const data = await response.json();
         return data;
     } catch (err) {
@@ -1162,7 +1162,7 @@ async function fetchTheRestOfMyWeatherData(city) {
         const lat = initialData.coord.lat.toFixed(2);
         const lon = initialData.coord.lon.toFixed(2);
         // final API call that is then processed and used by the app
-        const response = await fetch(`http://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
+        const response = await fetch(`api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&appid=f778724f49d8bcbf6a7c1111529b5d72`, { mode: 'cors' });
         return response;
     } catch (err) {
         return console.error(err);
@@ -1171,7 +1171,7 @@ async function fetchTheRestOfMyWeatherData(city) {
 
 async function cityOrCountryName(city) {
     try {
-        const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=8b74a6e5cbf14690bc2100254210608&q=${city}`);
+        const response = await fetch(`//api.weatherapi.com/v1/forecast.json?key=8b74a6e5cbf14690bc2100254210608&q=${city}`);
         const data = await response.json();
         return data;
     } catch (err) {
