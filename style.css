@@ -8,7 +8,7 @@
         --header-grid: 
                 "icon title"
                 "icon input submit unit";
-        --grid-width: 800px;
+        --grid-width: 700px;
         --city-width: 500px;
         --city-col: 2/5;
         --city-row: 5/9;
@@ -29,18 +29,26 @@
             'cityState'
             'weatherPic temp'
             'summary'
+            'rain'
             'windD'
-            'humidity';
+            'humidity'
+            'sunrise'
+            'sunset';
         --hourly-gc: 0/1;
-        --hourly-gr: 8/12;
+        --hourly-gr: 9/13;
         --hourly-gtc: repeat(auto-fit, 25%);
             --hour-width: 200px;
-            --hourly-gta: "hour";        
+            --hourly-gta: "hour";  
+        --forecastInfo-gc: 0/1;
+        --forecastInfo-gr: 15/16;      
         --forecast-gc: 0/1;
-        --forecast-gr: 13/19;
-        --forecast-width: 800px;
+        --forecast-gr: 16/22;
+        --forecast-width: 700px;
         --footer-gc: 0/1;
-        --footer-gr: 20/21;
+        --footer-gr: 25/26;
+        --temp-left: 25px;
+        --weather-left: -15px;
+
     }
 }
 
@@ -74,18 +82,25 @@
             'cityState'
             'weatherPic temp'
             'summary'
+            'rain'
             'windD'
-            'humidity';
+            'humidity'
+            'sunrise'
+            'sunset';
         --hourly-gc: 0/1;
-        --hourly-gr: 9/13;
+        --hourly-gr: 10/15;
         --hourly-gtc: repeat(auto-fit, 25%);
             --hour-width: 175px;
             --hourly-gta: "hour";
+        --forecastInfo-gc: 0/1;
+        --forecastInfo-gr: 17/18;
         --forecast-gc: 0/1;
-        --forecast-gr: 14/19;
+        --forecast-gr: 18/24;
         --forecast-width: 700px;
         --footer-gc: 0/1;
-        --footer-gr: 20/21;
+        --footer-gr: 25/26;
+        --temp-left: 25px;
+
     }
 }
 
@@ -113,24 +128,33 @@
         --lcity-width: 320px;
 
         --today-gc: 0/1;
-        --today-gr: 4/8;
+        --today-gr: 4/9;
         --today-gta: 
             'date'
             'cityState'
             'weatherPic temp'
             'summary'
+            'rain'
             'windD'
-            'humidity';
+            'humidity'
+            'sunrise'
+            'sunset';
         --hourly-gc: 0/1;
-        --hourly-gr: 8/13;
+        --hourly-gr: 10/15;
         --hourly-gtc: repeat(auto-fit, 25%);
         --hour-width: 125px;
         --hourly-gta: "hour";
+        --forecastInfo-gc: 0/1;
+        --forecastInfo-gr: 17/18;
         --forecast-gc: 0/1;
-        --forecast-gr: 14/19;
+        --forecast-gr: 18/24;
         --forecast-width: 500px;
         --footer-gc: 0/1;
-        --footer-gr: 20/21;
+        --footer-gr: 25/26;
+        --temp-left: 25px;
+        --weather-left: 20px;
+        --dayRainIcon-left: 15px;
+        --dayRain-left: 15px;
     }
 }
 
@@ -165,18 +189,27 @@
             'cityState'
             'weatherPic temp'
             'summary'
+            'rain'
             'windD'
-            'humidity';
+            'humidity'
+            'sunrise'
+            'sunset';
         --hourly-gc: 0/1;
-        --hourly-gr: 10/13;
+        --hourly-gr: 10/15;
         --hourly-gtc: repeat(auto-fit, 33%);
             --hour-width: 133px;
             --hourly-gta: "hour";
+        --forecastInfo-gc: 0/1;
+        --forecastInfo-gr: 17/18;
         --forecast-gc: 0/1;
-        --forecast-gr: 14/19;
+        --forecast-gr: 18/24;
         --forecast-width: 400px;
         --footer-gc: 0/1;
-        --footer-gr: 20/21;
+        --footer-gr: 25/26;
+        --temp-left: 25px;
+        --weather-left: 20px;
+        --dayRainIcon-left: 15px;
+        --dayRain-left: 15px;
     }
 }
 
@@ -211,18 +244,25 @@
             'cityState'
             'weatherPic temp'
             'summary'
+            'rain'
             'windD'
-            'humidity';
+            'humidity'
+            'sunrise'
+            'sunset';
         --hourly-gc: 0/1;
-        --hourly-gr: 10/13;
+        --hourly-gr: 10/15;
         --hourly-gtc: repeat(auto-fit, 33%);
             --hour-width: 100px;
             --hourly-gta: "hour";
         --forecast-gc: 0/1;
-        --forecast-gr: 14/19;
+        --forecast-gr: 18/24;
         --forecast-width: 330px;
         --footer-gc: 0/1;
-        --footer-gr: 20/21;
+        --footer-gr: 25/26;
+        --temp-left: 25px;
+        --weather-left: 20px;
+        --dayRainIcon-left: 15px;
+        --dayRain-left: 15px;
     }
 }
 
@@ -236,12 +276,13 @@ body {
     min-width: 300px;
     background-color: white;
     grid-template-columns: 100%;
-    grid-template-rows: repeat(20, 1fr);
+    grid-template-rows: repeat(25, 1fr);
     grid-template-areas: 
             "header"
             "input"
             "current"
             "hourly"
+            "forecastInfo"
             "forecast"
             "footer";
     justify-content: center;
@@ -319,7 +360,7 @@ button {
 }
 
 .lowerCity {
-    height: 38%;
+    height: 42%;
     width: var(--lcity-width);
     align-self: center;
     border-top-left-radius: 3px;
@@ -334,7 +375,7 @@ button {
 
 .lowerCity:focus {
     outline: 1px solid var(--accent-color);
-    border: 1px solid var(--accent-color)
+    border: inset 2px solid var(--accent-color)
 }
 
 .submit {
@@ -347,7 +388,13 @@ button {
     outline: transparent;
     border: 0px solid transparent;
     background-color: var(--accent-color);
+    font-family: var(--normal-text);
+    font-weight: 500;
     color: white;
+}
+
+.submit:hover {
+    background-color: rgb(255, 89, 29)
 }
 
 .unit {
@@ -357,8 +404,15 @@ button {
     border: 0px solid transparent;
     color: white;
     background-color: var(--accent-color);
+    font-family: var(--normal-text);
+    font-weight: 500;
     width: min(15%, 70px);
 }
+
+.unit:hover {
+    background-color: rgb(255, 89, 29)
+}
+
 
 .today {
     display: grid;
@@ -367,13 +421,21 @@ button {
     "cityState"
     "weatherPic temp" 
     "summary"
+    'rain'
     "windD"
-    "humidity";
+    "humidity"
+    "sunset"
+    "sunrise";
     grid-column: var(--today-gc);
     grid-row: var(--today-gr);
     width: var(--grid-width);
     justify-self: center;
+    align-self: center;
     margin-bottom: 50px;
+}
+
+.accents {
+    color: red;
 }
 
 .hourly {
@@ -448,7 +510,7 @@ button {
             grid-area: "rain";
             display: grid;
             background-color: white;
-            color: var(--dark-color);  
+            color: rgb(0, 149, 235);  
             grid-row: 2/4;
             grid-column: 3/5;
             text-align: left;
@@ -490,9 +552,9 @@ button {
         display: grid;
         justify-content: center;
         align-items: flex-end;
-        font-weight: 300;
+        font-weight: 500;
         font-family: var(--normal-text);
-        
+        color:rgb(0, 149, 235)
     }
 
     .weatherPic {
@@ -523,8 +585,20 @@ button {
         font-family: var(--normal-text);
     }
 
+    .rainChance {
+        margin-top: 10px;
+        grid-area: "rain";
+        display: grid;
+        color: rgb(0, 139, 235);
+        justify-content: center;
+        align-items: flex-end;
+        font-weight: 500;
+        font-family: var(--normal-text);
+    }
 
     .windD {
+        margin-top: 10px;
+
         grid-area: "windD";
         display: grid;
         justify-content: center;
@@ -534,6 +608,7 @@ button {
     }
 
     .humidity {
+        margin-top: 10px;
         grid-area: "humidity";
         display: grid;
         justify-content: center;
@@ -542,16 +617,64 @@ button {
         font-family: var(--normal-text);
     }
 
+    .sunset {
+        margin-top: 10px;
+
+        grid-area: "sunset";
+        display: grid;
+        justify-content: center;
+        align-items: start;
+        font-weight: 300;
+        font-family: var(--normal-text);
+    }
+
+    .sunrise {
+        margin-top: 10px;
+        grid-area: "sunrise";
+        display: grid;
+        justify-content: center;
+        align-items: start;
+        font-weight: 300;
+        font-family: var(--normal-text);
+    }
+
+.forecastInfo {
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: repeat(4, 25%);
+    justify-self: center;
+    justify-content: center;
+    align-content: end;
+    align-self: end;
+    color: rgba(0, 0, 0, 0.5);
+    font-family: var(--normal-text);
+    width: var(--forecast-width);
+    grid-area: "forecastInfo";
+    grid-column: var(--forecastInfo-gc);
+    grid-row: var(--forecastInfo-gr);
+    
+}
+
+    .tempInfo {
+        display: grid;
+        justify-self: start;
+    }
+
 .forecast {
+    position: relative;
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: repeat(8,  12.5%);
+    grid-template-areas: 
+    "info"
+    "day";
     justify-self: center;
     grid-column: var(--forecast-gc);
     grid-row: var(--forecast-gr);
     background-color: whitesmoke;
     width: var(--forecast-width);
 }
+
 
     .day {
         display: grid;
@@ -578,6 +701,8 @@ button {
             display: grid;
             align-content: center;
             justify-content: center;
+            position: relative;
+            left: var(--temp-left);
             align-items: start;
             font-weight: 300;
             font-family: var(--normal-text);
@@ -588,6 +713,8 @@ button {
         .dayWeather {
             grid-area: "weather";
             display: grid;
+            position: relative;
+            left: var(--weather-left);
             align-content: center;
             justify-content: end;
             align-items: start;
@@ -599,11 +726,13 @@ button {
             grid-area: "icon";
             display: grid;
             align-content: center;
+            position: relative;
             justify-content: end;
             align-items: start;
             font-weight: 300;
             font-family: var(--normal-text);
             grid-column: 5/6;
+            left: var(--dayRainIcon-left);
         }
 
         .dayRain {
@@ -615,10 +744,28 @@ button {
             font-weight: 300;
             font-family: var(--normal-text);
             grid-column: 6/7;
+            color: rgb(0, 149, 235);  
+            position: relative;
+            left: var(--dayRain-left);
         }
 
 .footer {
+    display: grid;
+    justify-content: center;
+    align-content: center;
     grid-column: var(--footer-gc);
     grid-row: var(--footer-gr);
     background-color: var(--dark-color);
+}
+
+.githubIcon {
+    width: 100px;
+    height: 100px;
+    transform: scale(1);
+    transition: .2s ease-in-out;
+}
+
+.githubIcon:hover {
+    transform: scale(1.05);
+    transition: .2s ease;
 }
