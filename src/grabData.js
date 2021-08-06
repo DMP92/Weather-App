@@ -33,9 +33,18 @@ async function fetchTheRestOfMyWeatherData(city) {
     }
 }
 
+async function cityOrCountryName(city) {
+    try {
+        const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=8b74a6e5cbf14690bc2100254210608&q=${city}`);
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        return console.error(err);
+    }
+}
 // function A
 // calls the 'fetchWeatherFor()' function with the city
-export default async function weatherDataFor(city) {
+async function weatherDataFor(city) {
     try {
         const response = await fetchTheRestOfMyWeatherData(city);
         const data = await response.json();
@@ -44,3 +53,5 @@ export default async function weatherDataFor(city) {
         return console.error(err);
     }
 }
+
+export { cityOrCountryName, weatherDataFor };

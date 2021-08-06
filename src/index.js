@@ -1,9 +1,11 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-alert */
 /* eslint-disable default-case */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
-import weatherDataFor from './grabData';
+import { weatherDataFor, cityOrCountryName } from './grabData';
 import convertUnitTo from './helperFunctions';
 import dailyWeatherModule from './forecast';
 import hourly from './hourly';
@@ -16,35 +18,79 @@ const button = document.querySelector('.submit');
 const unitButton = document.querySelector('.unit');
 const inputArray = [];
 
+async function autoCity() {
+    const stateName = await cityOrCountryName('Honolulu');
+    const results = await weatherDataFor(stateName.location.name);
+    dailyWeatherModule.data(results);
+    currentWeatherModule.data(results);
+    currentWeatherModule.name(stateName);
+    currentWeatherModule.winds(stateName);
+    hourly.dataObtain(results);
+}
+
 function inputLimiter(state) {
     inputArray.pop();
     inputArray.push(state);
 }
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData(input) {
+async function fetchData() {
     const city = inputArray[0];
+    let results = '';
+    let stateName = '';
 
-    if (city === true) {
-        const results = await weatherDataFor(higherInput.value);
+    switch (true) {
+    case city === true && higherInput.value !== '':
+        stateName = await cityOrCountryName(higherInput.value);
+        results = await weatherDataFor(stateName.location.name);
         dailyWeatherModule.data(results);
         // eslint-disable-next-line no-use-before-define
         currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
         hourly.dataObtain(results);
-    } else if (city === false) {
-        const results = await weatherDataFor(lowerInput.value);
+        break;
+    case city === false && lowerInput.value !== '':
+        stateName = await cityOrCountryName(lowerInput.value);
+        results = await weatherDataFor(stateName.location.name);
         dailyWeatherModule.data(results);
         // eslint-disable-next-line no-use-before-define
         currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
         hourly.dataObtain(results);
+        break;
+    case city === false && lowerInput.value === '':
+        stateName = await cityOrCountryName(higherInput.value);
+        results = await weatherDataFor(stateName.location.name);
+        dailyWeatherModule.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        hourly.dataObtain(results);
+        break;
+    case city === true && higherInput.value === '':
+        stateName = await cityOrCountryName(lowerInput.value);
+        results = await weatherDataFor(stateName.location.name);
+        dailyWeatherModule.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        hourly.dataObtain(results);
+        break;
     }
 }
 
 // upon pressing the submit button, or pressing enter the function grabs required data
 button.addEventListener('click', async () => {
-    const city = lowerInput.value;
-    clearDOM();
-    fetchData();
+    if (higherInput.value === '' && lowerInput.value === '') {
+        alert('Enter the name of a city');
+    } else {
+        clearDOM();
+        fetchData();
+    }
 });
 
 higherInput.addEventListener('input', () => {
@@ -56,16 +102,22 @@ lowerInput.addEventListener('input', () => {
 });
 
 // acts as another search button to refresh contents of DOM according to unit selected
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     unitButton.textContent = 'F';
     lowerInput.value = '';
     higherInput.value = '';
+    autoCity();
 });
 
 window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 13) {
-        clearDOM();
-        fetchData();
+    switch (true) {
+    case e.keyCode === 13:
+        if (higherInput.value === '' && lowerInput.value === '') {
+            alert('Enter the name of a city');
+        } else {
+            clearDOM();
+            fetchData();
+        }
     }
 });
 // gathers temp unit
@@ -91,6 +143,19 @@ const currentWeatherModule = (() => {
 
     const wToday = {};
 
+    function printStateOrCountry(regionData) {
+        const cityStateContainer = document.querySelector('.cityState');
+
+        switch (true) {
+        case regionData.location.country === 'United States of America':
+            cityStateContainer.textContent = `${regionData.location.name}, ${regionData.location.region}`;
+            break;
+        case regionData.location.country !== 'United States of America':
+            cityStateContainer.textContent = `${regionData.location.name}, ${regionData.location.country}`;
+            break;
+        }
+    }
+
     function shareToday() {
         const page = 'current';
         printModule.print(wToday, page);
@@ -102,9 +167,17 @@ const currentWeatherModule = (() => {
         wToday.time = `${convertTime}`;
     }
 
+    function sunriseSunset(object) {
+        const rawSunrise = convertUnitTo.unix(object.sunrise);
+        const rawSunset = convertUnitTo.unix(object.sunset);
+        const sunrise = rawSunrise.slice(17, 26);
+        const sunset = rawSunset.slice(17, 26);
+        wToday.sunrise = sunrise;
+        wToday.sunset = sunset;
+    }
+
     function _breezeType(windSpeed) {
         let breezeMessage = '';
-
         switch (true) {
         case windSpeed <= 2.5:
             breezeMessage = 'Light breeze.';
@@ -131,12 +204,12 @@ const currentWeatherModule = (() => {
     }
 
     // data about today's expected wind speed an degree
-    function _winds(current) {
-        const degree = current.wind_deg;
-        const speed = current.wind_speed;
-        _breezeType(speed);
-        wToday.windDegree = `Wind: ${degree}°`;
-        wToday.windSpeed = `${speed}mph`;
+    function winds(weather) {
+        const windDegree = weather.current.wind_dir;
+        const windSpeed = weather.current.wind_mph;
+        const degree = `Wind: ${windDegree}`;
+        const speed = `${windSpeed}mph`;
+        printModule.printWind(degree, speed);
     }
 
     // grabs data about today's projected humidity
@@ -197,19 +270,19 @@ const currentWeatherModule = (() => {
         wToday.icon = icons;
     }
     // sends data off to the different functions inside 'current' weather module
-    function _parseData(current, tz) {
+    async function _parseData(current, tz) {
         currentDateTime(current, tz);
         weatherIcon(current);
         _fetchHumidity(current);
         prepareTempController(current);
         _fetchWeather(current);
-        _winds(current);
+        sunriseSunset(current);
+        _breezeType(current.windSpeed);
         shareToday(wToday);
     }
 
     // grabs and parses data for future use
     function obtainData(data, timezone) {
-        console.log(data);
         const currentData = data.current;
         const tz = data.timezone;
         _parseData(currentData, tz);
@@ -218,5 +291,7 @@ const currentWeatherModule = (() => {
     return {
         data: obtainData,
         current: shareToday,
+        winds,
+        name: printStateOrCountry,
     };
 })();

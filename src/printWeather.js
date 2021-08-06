@@ -1,5 +1,9 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
+
+import convertUnitTo from './helperFunctions';
+
 /* eslint-disable default-case */
 const hourlyModule = (() => {
     const hourlyDiv = document.querySelector('.hourly');
@@ -227,6 +231,7 @@ const forecastModule = (() => {
         dayDates(object);
         dayWeathers(object.weather);
         dayRainIcons(object.rain);
+        printModule.rain(object.rain[0]);
         let i = 0;
 
         object.temp.forEach((obj) => {
@@ -258,8 +263,16 @@ const printModule = (() => {
         today[0].textContent = object.time;
     }
 
-    function printState(object) {
+    function printRainChance(object) {
+        const rainContainer = document.querySelector('.rainChance');
+        rainContainer.textContent = `${object} Chance of rain`;
+    }
 
+    function printSunTimes(object) {
+        const sunriseContainer = document.querySelector('.sunrise');
+        const sunsetContainer = document.querySelector('.sunset');
+        sunriseContainer.textContent = `Sunrise: ${object.sunrise}`;
+        sunsetContainer.textContent = `Sunset: ${object.sunset}`;
     }
 
     function printWeatherPic(images, status) {
@@ -295,12 +308,12 @@ const printModule = (() => {
         today[4].textContent = `${object.feelsLike} ${object.weatherTitle} ${object.breeze}`;
     }
 
-    function printWind(object) {
-        today[5].textContent = `${object.windDegree} ${object.windSpeed}`;
+    function printWind(degree, speed) {
+        today[6].textContent = `${degree} ${speed}`;
     }
 
     function printHumidity(object) {
-        today[6].textContent = object.humidity;
+        today[7].textContent = object.humidity;
     }
 
     function printToday(object, img) {
@@ -310,6 +323,7 @@ const printModule = (() => {
         printSummary(object);
         printWind(object);
         printHumidity(object);
+        printSunTimes(object);
     }
 
     function printObjects(object, page, img) {
@@ -340,7 +354,9 @@ const printModule = (() => {
     return {
         print: printObjects,
         check: checkForImage,
+        printWind,
         delete: deleteData,
+        rain: printRainChance,
     };
 })();
 

@@ -1131,7 +1131,8 @@ const dailyWeatherModule = (() => {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ weatherDataFor)
+/* harmony export */   "cityOrCountryName": () => (/* binding */ cityOrCountryName),
+/* harmony export */   "weatherDataFor": () => (/* binding */ weatherDataFor)
 /* harmony export */ });
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-console */
@@ -1168,6 +1169,15 @@ async function fetchTheRestOfMyWeatherData(city) {
     }
 }
 
+async function cityOrCountryName(city) {
+    try {
+        const response = await fetch(`http://api.weatherapi.com/v1/forecast.json?key=8b74a6e5cbf14690bc2100254210608&q=${city}`);
+        const data = await response.json();
+        return data;
+    } catch (err) {
+        return console.error(err);
+    }
+}
 // function A
 // calls the 'fetchWeatherFor()' function with the city
 async function weatherDataFor(city) {
@@ -1179,6 +1189,8 @@ async function weatherDataFor(city) {
         return console.error(err);
     }
 }
+
+
 
 
 /***/ }),
@@ -1465,8 +1477,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "hourlyModule": () => (/* binding */ hourlyModule),
 /* harmony export */   "clearDOM": () => (/* binding */ clearDOM)
 /* harmony export */ });
+/* harmony import */ var _helperFunctions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./helperFunctions */ "./src/helperFunctions.js");
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
+
+
+
 /* eslint-disable default-case */
 const hourlyModule = (() => {
     const hourlyDiv = document.querySelector('.hourly');
@@ -1694,6 +1711,7 @@ const forecastModule = (() => {
         dayDates(object);
         dayWeathers(object.weather);
         dayRainIcons(object.rain);
+        printModule.rain(object.rain[0]);
         let i = 0;
 
         object.temp.forEach((obj) => {
@@ -1725,8 +1743,16 @@ const printModule = (() => {
         today[0].textContent = object.time;
     }
 
-    function printState(object) {
+    function printRainChance(object) {
+        const rainContainer = document.querySelector('.rainChance');
+        rainContainer.textContent = `${object} Chance of rain`;
+    }
 
+    function printSunTimes(object) {
+        const sunriseContainer = document.querySelector('.sunrise');
+        const sunsetContainer = document.querySelector('.sunset');
+        sunriseContainer.textContent = `Sunrise: ${object.sunrise}`;
+        sunsetContainer.textContent = `Sunset: ${object.sunset}`;
     }
 
     function printWeatherPic(images, status) {
@@ -1762,12 +1788,12 @@ const printModule = (() => {
         today[4].textContent = `${object.feelsLike} ${object.weatherTitle} ${object.breeze}`;
     }
 
-    function printWind(object) {
-        today[5].textContent = `${object.windDegree} ${object.windSpeed}`;
+    function printWind(degree, speed) {
+        today[6].textContent = `${degree} ${speed}`;
     }
 
     function printHumidity(object) {
-        today[6].textContent = object.humidity;
+        today[7].textContent = object.humidity;
     }
 
     function printToday(object, img) {
@@ -1777,6 +1803,7 @@ const printModule = (() => {
         printSummary(object);
         printWind(object);
         printHumidity(object);
+        printSunTimes(object);
     }
 
     function printObjects(object, page, img) {
@@ -1807,7 +1834,9 @@ const printModule = (() => {
     return {
         print: printObjects,
         check: checkForImage,
+        printWind,
         delete: deleteData,
+        rain: printRainChance,
     };
 })();
 
@@ -1904,6 +1933,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _hourly__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./hourly */ "./src/hourly.js");
 /* harmony import */ var _printWeather__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./printWeather */ "./src/printWeather.js");
 /* harmony import */ var _iconController__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./iconController */ "./src/iconController.js");
+/* eslint-disable no-use-before-define */
+/* eslint-disable no-alert */
 /* eslint-disable default-case */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-plusplus */
@@ -1922,35 +1953,79 @@ const button = document.querySelector('.submit');
 const unitButton = document.querySelector('.unit');
 const inputArray = [];
 
+async function autoCity() {
+    const stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)('Honolulu');
+    const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
+    _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+    currentWeatherModule.data(results);
+    currentWeatherModule.name(stateName);
+    currentWeatherModule.winds(stateName);
+    _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+}
+
 function inputLimiter(state) {
     inputArray.pop();
     inputArray.push(state);
 }
 // fetches data that is then passed into the 'currentWeatherModule' and all
 // other modules
-async function fetchData(input) {
+async function fetchData() {
     const city = inputArray[0];
+    let results = '';
+    let stateName = '';
 
-    if (city === true) {
-        const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(higherInput.value);
+    switch (true) {
+    case city === true && higherInput.value !== '':
+        stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(higherInput.value);
+        results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
         _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
         // eslint-disable-next-line no-use-before-define
         currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
         _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
-    } else if (city === false) {
-        const results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.default)(lowerInput.value);
+        break;
+    case city === false && lowerInput.value !== '':
+        stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(lowerInput.value);
+        results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
         _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
         // eslint-disable-next-line no-use-before-define
         currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
         _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+        break;
+    case city === false && lowerInput.value === '':
+        stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(higherInput.value);
+        results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
+        _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+        break;
+    case city === true && higherInput.value === '':
+        stateName = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.cityOrCountryName)(lowerInput.value);
+        results = await (0,_grabData__WEBPACK_IMPORTED_MODULE_0__.weatherDataFor)(stateName.location.name);
+        _forecast__WEBPACK_IMPORTED_MODULE_2__.default.data(results);
+        // eslint-disable-next-line no-use-before-define
+        currentWeatherModule.data(results);
+        currentWeatherModule.name(stateName);
+        currentWeatherModule.winds(stateName);
+        _hourly__WEBPACK_IMPORTED_MODULE_3__.default.dataObtain(results);
+        break;
     }
 }
 
 // upon pressing the submit button, or pressing enter the function grabs required data
 button.addEventListener('click', async () => {
-    const city = lowerInput.value;
-    (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
-    fetchData();
+    if (higherInput.value === '' && lowerInput.value === '') {
+        alert('Enter the name of a city');
+    } else {
+        (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
+        fetchData();
+    }
 });
 
 higherInput.addEventListener('input', () => {
@@ -1962,16 +2037,22 @@ lowerInput.addEventListener('input', () => {
 });
 
 // acts as another search button to refresh contents of DOM according to unit selected
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     unitButton.textContent = 'F';
     lowerInput.value = '';
     higherInput.value = '';
+    autoCity();
 });
 
 window.addEventListener('keydown', (e) => {
-    if (e.keyCode === 13) {
-        (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
-        fetchData();
+    switch (true) {
+    case e.keyCode === 13:
+        if (higherInput.value === '' && lowerInput.value === '') {
+            alert('Enter the name of a city');
+        } else {
+            (0,_printWeather__WEBPACK_IMPORTED_MODULE_4__.clearDOM)();
+            fetchData();
+        }
     }
 });
 // gathers temp unit
@@ -1997,6 +2078,19 @@ const currentWeatherModule = (() => {
 
     const wToday = {};
 
+    function printStateOrCountry(regionData) {
+        const cityStateContainer = document.querySelector('.cityState');
+
+        switch (true) {
+        case regionData.location.country === 'United States of America':
+            cityStateContainer.textContent = `${regionData.location.name}, ${regionData.location.region}`;
+            break;
+        case regionData.location.country !== 'United States of America':
+            cityStateContainer.textContent = `${regionData.location.name}, ${regionData.location.country}`;
+            break;
+        }
+    }
+
     function shareToday() {
         const page = 'current';
         _printWeather__WEBPACK_IMPORTED_MODULE_4__.printModule.print(wToday, page);
@@ -2008,9 +2102,17 @@ const currentWeatherModule = (() => {
         wToday.time = `${convertTime}`;
     }
 
+    function sunriseSunset(object) {
+        const rawSunrise = _helperFunctions__WEBPACK_IMPORTED_MODULE_1__.default.unix(object.sunrise);
+        const rawSunset = _helperFunctions__WEBPACK_IMPORTED_MODULE_1__.default.unix(object.sunset);
+        const sunrise = rawSunrise.slice(17, 26);
+        const sunset = rawSunset.slice(17, 26);
+        wToday.sunrise = sunrise;
+        wToday.sunset = sunset;
+    }
+
     function _breezeType(windSpeed) {
         let breezeMessage = '';
-
         switch (true) {
         case windSpeed <= 2.5:
             breezeMessage = 'Light breeze.';
@@ -2037,12 +2139,12 @@ const currentWeatherModule = (() => {
     }
 
     // data about today's expected wind speed an degree
-    function _winds(current) {
-        const degree = current.wind_deg;
-        const speed = current.wind_speed;
-        _breezeType(speed);
-        wToday.windDegree = `Wind: ${degree}°`;
-        wToday.windSpeed = `${speed}mph`;
+    function winds(weather) {
+        const windDegree = weather.current.wind_dir;
+        const windSpeed = weather.current.wind_mph;
+        const degree = `Wind: ${windDegree}`;
+        const speed = `${windSpeed}mph`;
+        _printWeather__WEBPACK_IMPORTED_MODULE_4__.printModule.printWind(degree, speed);
     }
 
     // grabs data about today's projected humidity
@@ -2103,19 +2205,19 @@ const currentWeatherModule = (() => {
         wToday.icon = icons;
     }
     // sends data off to the different functions inside 'current' weather module
-    function _parseData(current, tz) {
+    async function _parseData(current, tz) {
         currentDateTime(current, tz);
         weatherIcon(current);
         _fetchHumidity(current);
         prepareTempController(current);
         _fetchWeather(current);
-        _winds(current);
+        sunriseSunset(current);
+        _breezeType(current.windSpeed);
         shareToday(wToday);
     }
 
     // grabs and parses data for future use
     function obtainData(data, timezone) {
-        console.log(data);
         const currentData = data.current;
         const tz = data.timezone;
         _parseData(currentData, tz);
@@ -2124,6 +2226,8 @@ const currentWeatherModule = (() => {
     return {
         data: obtainData,
         current: shareToday,
+        winds,
+        name: printStateOrCountry,
     };
 })();
 
